@@ -1,0 +1,828 @@
+/* ============================================================
+   ملف: style.css
+   الوظيفة: التنسيقات الكاملة للواجهة الأمامية
+   يشمل: الهيدر، البطاقات، التعليقات، الفوتر، الوضع الليلي، تجاوب الجوال
+   ============================================================ */
+
+/* ---------- 1. متغيرات CSS الأساسية ---------- */
+:root {
+    --primary: #c48b4c;           /* اللون الأساسي (سيتم تغييره ديناميكياً) */
+    --primary-dark: #a6733a;      /* لون أغمق للأزرار عند التحويم */
+    --primary-light: #f5efe6;     /* لون فاتح للخلفيات */
+    --bg: #f0f2f5;                /* لون خلفية الصفحة */
+    --white: #ffffff;             /* أبيض */
+    --text: #1c1e21;              /* لون النص الرئيسي */
+    --text-secondary: #65676b;    /* لون النص الثانوي */
+    --border: #e4e6eb;            /* لون الحدود */
+    --shadow: 0 1px 4px rgba(0,0,0,0.08); /* ظل خفيف */
+    --shadow-lg: 0 8px 24px rgba(0,0,0,0.12); /* ظل أكبر */
+    --radius: 12px;               /* تدوير الزوايا */
+    --radius-sm: 8px;             /* تدوير أصغر */
+    --radius-full: 50px;          /* تدوير كامل (للأزرار الدائرية) */
+    --transition: 0.3s ease;      /* حركة انتقالية */
+    --font: 'Cairo', sans-serif;  /* الخط الأساسي */
+    --font-title: 'Playfair Display', serif; /* خط العناوين */
+}
+
+/* ---------- 2. إعادة تعيين الأساسيات ---------- */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    scroll-behavior: smooth; /* تمرير سلس */
+}
+
+body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+button {
+    cursor: pointer;
+    font-family: var(--font);
+}
+
+/* ---------- 3. الشريط العلوي (الهيدر) ---------- */
+#site-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: var(--white);
+    box-shadow: var(--shadow);
+    z-index: 1000;
+    padding: 0;
+}
+
+.header-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 20px;
+    height: 56px;
+    gap: 15px;
+}
+
+/* شعار الموقع */
+.logo {
+    font-family: var(--font-title);
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--primary);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: var(--transition);
+    letter-spacing: 1px;
+}
+.logo:hover {
+    opacity: 0.85;
+}
+
+/* شريط البحث */
+.search-box {
+    display: flex;
+    align-items: center;
+    background: var(--bg);
+    border-radius: var(--radius-full);
+    padding: 8px 16px;
+    flex: 1;
+    max-width: 400px;
+    gap: 8px;
+    transition: var(--transition);
+}
+.search-box:focus-within {
+    background: var(--white);
+    box-shadow: 0 0 0 2px var(--primary);
+}
+.search-box .search-icon {
+    font-size: 1rem;
+    color: var(--text-secondary);
+}
+.search-box input {
+    border: none;
+    background: transparent;
+    outline: none;
+    font-family: var(--font);
+    font-size: 0.95rem;
+    width: 100%;
+    color: var(--text);
+}
+.search-box input::placeholder {
+    color: var(--text-secondary);
+}
+#searchClearBtn {
+    background: none;
+    border: none;
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 0 4px;
+}
+#searchClearBtn:hover {
+    color: var(--text);
+}
+
+/* أزرار الهيدر */
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.icon-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: none;
+    background: var(--bg);
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition);
+}
+.icon-btn:hover {
+    background: #d8dadf;
+}
+
+/* ---------- 4. شريط التبويبات ---------- */
+.nav-container {
+    border-top: 1px solid var(--border);
+    padding: 0 20px;
+    position: relative;
+}
+.nav-tabs {
+    display: flex;
+    overflow-x: auto;
+    gap: 4px;
+    padding: 8px 0;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; /* إخفاء شريط التمرير في فايرفوكس */
+}
+.nav-tabs::-webkit-scrollbar {
+    display: none; /* إخفاء شريط التمرير في كروم */
+}
+.tab-item {
+    padding: 8px 16px;
+    border-radius: var(--radius-full);
+    white-space: nowrap;
+    cursor: pointer;
+    background: transparent;
+    transition: var(--transition);
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    user-select: none;
+}
+.tab-item:hover {
+    background: #e4e6eb;
+}
+.tab-item.active {
+    background: var(--primary);
+    color: white;
+}
+
+/* شريط الفروع المنسدل */
+.subcategory-bar {
+    padding: 6px 0 10px;
+    border-top: 1px solid var(--border);
+    animation: slideDown 0.3s ease;
+}
+.subcategory-list {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+.sub-item {
+    padding: 6px 14px;
+    border-radius: var(--radius-full);
+    cursor: pointer;
+    font-size: 0.85rem;
+    background: #f0f2f5;
+    transition: var(--transition);
+}
+.sub-item:hover,
+.sub-item.active {
+    background: var(--primary);
+    color: white;
+}
+
+@keyframes slideDown {
+    from { opacity: 0; max-height: 0; }
+    to { opacity: 1; max-height: 60px; }
+}
+
+/* ---------- 5. التخطيط الرئيسي ---------- */
+.main-layout {
+    display: flex;
+    max-width: 1100px;
+    margin: 120px auto 40px; /* مسافة تحت الهيدر الثابت */
+    padding: 0 20px;
+    gap: 20px;
+    min-height: 60vh;
+}
+
+.feed {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* العمود الجانبي */
+.right-sidebar {
+    flex: 0 0 300px;
+    position: sticky;
+    top: 80px;
+    align-self: flex-start;
+}
+.sticky-widget {
+    background: var(--white);
+    border-radius: var(--radius);
+    padding: 20px;
+    box-shadow: var(--shadow);
+}
+.sticky-widget h4 {
+    color: var(--primary);
+    margin-bottom: 15px;
+    font-size: 1.1rem;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 10px;
+}
+
+/* ---------- 6. بطاقة المقال (تصميم فيسبوكي) ---------- */
+.post-card {
+    background: var(--white);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    transition: var(--transition);
+    position: relative;
+}
+.post-card:hover {
+    box-shadow: var(--shadow-lg);
+}
+
+/* رأس البطاقة */
+.post-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+}
+.post-category-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+.category-tag {
+    background: var(--primary-light);
+    color: var(--primary);
+    padding: 4px 12px;
+    border-radius: var(--radius-full);
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: var(--transition);
+}
+.category-tag:hover {
+    background: var(--primary);
+    color: white;
+}
+.subcategory-tag {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+/* صورة المقال */
+.post-image-container {
+    width: 100%;
+    max-height: 400px;
+    overflow: hidden;
+}
+.post-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+.post-image-container:hover .post-image {
+    transform: scale(1.02);
+}
+
+/* جسم البطاقة */
+.post-body {
+    padding: 16px;
+}
+.post-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+    line-height: 1.4;
+    color: var(--text);
+}
+.post-title a:hover {
+    color: var(--primary);
+}
+.post-meta {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+}
+.post-content {
+    font-size: 0.95rem;
+    line-height: 1.8;
+    color: var(--text);
+}
+.post-content p {
+    margin-bottom: 10px;
+}
+.read-more {
+    color: var(--primary);
+    cursor: pointer;
+    font-weight: 700;
+    transition: var(--transition);
+}
+.read-more:hover {
+    text-decoration: underline;
+}
+
+/* أزرار التفاعل */
+.post-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-top: 1px solid var(--border);
+    flex-wrap: wrap;
+}
+.action-btn {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 14px;
+    border-radius: var(--radius-full);
+    border: none;
+    background: transparent;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: var(--transition);
+    font-weight: 600;
+}
+.action-btn:hover {
+    background: #f0f2f5;
+}
+.action-btn.liked {
+    color: #e74c3c;
+}
+.action-btn .like-count,
+.action-btn .comment-count {
+    font-weight: 400;
+}
+
+/* القائمة المنسدلة (⋯) */
+.post-options {
+    position: relative;
+}
+.dropdown-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: var(--transition);
+    background: transparent;
+    border: none;
+    font-size: 1.3rem;
+    color: var(--text-secondary);
+}
+.dropdown-btn:hover {
+    background: #f0f2f5;
+}
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: var(--white);
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-lg);
+    min-width: 180px;
+    z-index: 50;
+    padding: 8px 0;
+    animation: fadeIn 0.2s ease;
+}
+.dropdown-menu.active {
+    display: block;
+}
+.dropdown-item {
+    padding: 10px 16px;
+    cursor: pointer;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background 0.2s;
+    font-size: 0.9rem;
+}
+.dropdown-item:hover {
+    background: #f0f2f5;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ---------- 7. قسم التعليقات ---------- */
+.comments-section {
+    border-top: 1px solid var(--border);
+    padding: 12px 16px;
+    background: #f8f9fa;
+    animation: slideDown 0.3s ease;
+}
+.comments-list {
+    max-height: 300px;
+    overflow-y: auto;
+    margin-bottom: 12px;
+}
+.comment-item {
+    display: flex;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+}
+.comment-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #e4e6eb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+.comment-content {
+    flex: 1;
+}
+.comment-author {
+    font-weight: 700;
+    font-size: 0.85rem;
+}
+.comment-date {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    margin-right: 8px;
+}
+.comment-content p {
+    margin-top: 4px;
+    font-size: 0.9rem;
+}
+
+/* نموذج إضافة تعليق */
+.comment-form {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+.comment-input {
+    flex: 1;
+    padding: 10px 14px;
+    border-radius: var(--radius-full);
+    border: 1px solid var(--border);
+    font-family: var(--font);
+    font-size: 0.9rem;
+    outline: none;
+    transition: var(--transition);
+}
+.comment-input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px var(--primary-light);
+}
+.comment-submit-btn {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: var(--radius-full);
+    font-family: var(--font);
+    font-weight: 700;
+    cursor: pointer;
+    transition: var(--transition);
+    white-space: nowrap;
+}
+.comment-submit-btn:hover {
+    background: var(--primary-dark);
+}
+
+/* ---------- 8. الفوتر ---------- */
+#site-footer {
+    background: var(--white);
+    border-top: 1px solid var(--border);
+    margin-top: 40px;
+}
+.footer-container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 30px 20px;
+}
+
+/* تبويبات الفوتر */
+.footer-tabs {
+    display: flex;
+    gap: 10px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 20px;
+}
+.footer-tab {
+    background: transparent;
+    border: none;
+    padding: 12px 20px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: var(--transition);
+}
+.footer-tab.active {
+    color: var(--primary);
+    border-bottom-color: var(--primary);
+}
+.footer-tab:hover {
+    color: var(--text);
+}
+
+/* شبكة المقالات المصغرة */
+.footer-posts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 15px;
+    min-height: 100px;
+}
+.footer-mini-card {
+    display: flex;
+    gap: 12px;
+    padding: 10px;
+    border-radius: var(--radius-sm);
+    transition: var(--transition);
+    background: #fafafa;
+}
+.footer-mini-card:hover {
+    background: #f0f2f5;
+}
+.mini-card-image {
+    width: 80px;
+    height: 60px;
+    border-radius: 6px;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+.mini-card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.mini-card-content {
+    flex: 1;
+    min-width: 0;
+}
+.mini-card-title {
+    font-size: 0.9rem;
+    font-weight: 700;
+    margin-bottom: 4px;
+    line-height: 1.3;
+}
+.mini-card-title a:hover {
+    color: var(--primary);
+}
+.mini-card-meta {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    margin-bottom: 4px;
+}
+.mini-card-text {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    line-height: 1.4;
+}
+
+/* قسم الروابط والأزرار */
+.footer-middle {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+    padding: 20px 0;
+    border-top: 1px solid var(--border);
+    margin-top: 20px;
+}
+.footer-custom-buttons {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+.footer-social {
+    display: flex;
+    gap: 15px;
+}
+.social-link {
+    color: var(--text-secondary);
+    transition: var(--transition);
+    font-size: 0.9rem;
+}
+.social-link:hover {
+    color: var(--primary);
+}
+
+/* القسم السفلي */
+.footer-bottom {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    padding-top: 15px;
+    border-top: 1px solid var(--border);
+    position: relative;
+}
+.footer-copyright {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+}
+.admin-gate {
+    cursor: default;
+    user-select: none;
+    transition: var(--transition);
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+.admin-gate:hover {
+    background: #f0f2f5;
+}
+
+/* زر العودة للأعلى */
+.back-to-top {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: white;
+    border: none;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s, transform 0.3s;
+    z-index: 999;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+.back-to-top:hover {
+    transform: scale(1.1);
+}
+
+/* ---------- 9. رسائل الحالة ---------- */
+.no-posts {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-secondary);
+}
+.no-posts-icon {
+    font-size: 3rem;
+    margin-bottom: 15px;
+}
+.loading-spinner,
+.loading-mini {
+    text-align: center;
+    padding: 30px;
+    color: var(--text-secondary);
+    font-size: 1rem;
+}
+.error-message,
+.error-text {
+    color: #e74c3c;
+    text-align: center;
+    padding: 20px;
+}
+
+/* ---------- 10. الوضع الليلي (Dark Mode) ---------- */
+body.dark-mode {
+    --bg: #18191a;
+    --white: #242526;
+    --text: #e4e6eb;
+    --text-secondary: #b0b3b8;
+    --border: #3e4042;
+    --shadow: 0 1px 4px rgba(0,0,0,0.3);
+    --shadow-lg: 0 8px 24px rgba(0,0,0,0.4);
+    --primary-light: #3a3b3c;
+}
+body.dark-mode .search-box {
+    background: #3a3b3c;
+}
+body.dark-mode .search-box input {
+    color: #e4e6eb;
+}
+body.dark-mode .icon-btn {
+    background: #3a3b3c;
+    color: #e4e6eb;
+}
+body.dark-mode .comments-section {
+    background: #1c1c1c;
+}
+body.dark-mode .footer-mini-card {
+    background: #2a2a2a;
+}
+body.dark-mode .dropdown-menu {
+    background: #242526;
+}
+body.dark-mode .action-btn:hover {
+    background: #3a3b3c;
+}
+
+/* ---------- 11. تجاوب الجوال ---------- */
+@media (max-width: 768px) {
+    .header-top {
+        padding: 8px 12px;
+        gap: 10px;
+    }
+    .logo {
+        font-size: 1.3rem;
+    }
+    .search-box {
+        max-width: 200px;
+        padding: 6px 12px;
+    }
+    .main-layout {
+        flex-direction: column;
+        margin-top: 110px;
+        padding: 0 10px;
+    }
+    .right-sidebar {
+        position: static;
+        flex: none;
+        width: 100%;
+    }
+    .post-title {
+        font-size: 1.1rem;
+    }
+    .post-actions {
+        gap: 4px;
+    }
+    .action-btn {
+        padding: 6px 10px;
+        font-size: 0.8rem;
+    }
+    .footer-posts-grid {
+        grid-template-columns: 1fr;
+    }
+    .footer-tabs {
+        overflow-x: auto;
+    }
+    .footer-middle {
+        flex-direction: column;
+        text-align: center;
+    }
+    .back-to-top {
+        bottom: 20px;
+        right: 20px;
+        width: 40px;
+        height: 40px;
+    }
+  }
