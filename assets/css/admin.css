@@ -1,10 +1,11 @@
 /* ============================================================
-   ملف: admin.css
+   ملف: admin.css (مُحدّث)
    الوظيفة: تنسيقات لوحة التحكم
-   يشمل: الشريط الجانبي، النماذج، الأزرار، البطاقات، التنبيهات
+   يشمل: الشريط الجانبي، النماذج، الأزرار، البطاقات،
+         النافذة المنبثقة، محرر المحتوى، الوضع الليلي
    ============================================================ */
 
-/* ---------- 1. متغيرات CSS ---------- */
+/* ---------- 1. متغيرات ---------- */
 :root {
     --admin-primary: #c48b4c;
     --admin-primary-dark: #a6733a;
@@ -22,12 +23,7 @@
 }
 
 /* ---------- 2. الأساسيات ---------- */
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
-
+* { box-sizing: border-box; margin: 0; padding: 0; }
 body {
     font-family: var(--admin-font);
     background: var(--admin-bg);
@@ -35,11 +31,7 @@ body {
     direction: rtl;
     line-height: 1.6;
 }
-
-a {
-    text-decoration: none;
-    color: inherit;
-}
+a { text-decoration: none; color: inherit; }
 
 /* ---------- 3. شاشة تسجيل الدخول ---------- */
 #login-screen {
@@ -92,15 +84,10 @@ a {
     margin-top: 15px;
     transition: var(--admin-transition);
 }
-#login-form button:hover {
-    background: var(--admin-primary-dark);
-}
+#login-form button:hover { background: var(--admin-primary-dark); }
 
 /* ---------- 4. تخطيط لوحة التحكم ---------- */
-#admin-screen {
-    display: flex;
-    min-height: 100vh;
-}
+#admin-screen { display: flex; min-height: 100vh; }
 
 /* الشريط الجانبي */
 .admin-sidebar {
@@ -109,9 +96,7 @@ a {
     border-left: 1px solid var(--admin-border);
     padding: 20px 0;
     position: fixed;
-    top: 0;
-    right: 0;
-    bottom: 0;
+    top: 0; right: 0; bottom: 0;
     overflow-y: auto;
     box-shadow: var(--admin-shadow);
     z-index: 100;
@@ -125,10 +110,7 @@ a {
     margin-bottom: 15px;
     text-align: center;
 }
-.admin-sidebar ul {
-    list-style: none;
-    padding: 0;
-}
+.admin-sidebar ul { list-style: none; padding: 0; }
 .admin-sidebar ul li {
     padding: 14px 20px;
     cursor: pointer;
@@ -140,17 +122,11 @@ a {
     transition: var(--admin-transition);
     border-right: 3px solid transparent;
 }
-.admin-sidebar ul li:hover {
-    background: #f5f6f8;
-    color: var(--admin-text);
-}
+.admin-sidebar ul li:hover { background: #f5f6f8; color: var(--admin-text); }
 .admin-sidebar ul li.active {
     background: #fef9f3;
     color: var(--admin-primary);
     border-right-color: var(--admin-primary);
-}
-.admin-sidebar ul li .icon {
-    font-size: 1.2rem;
 }
 
 /* منطقة المحتوى */
@@ -187,27 +163,13 @@ a {
     font-size: 0.9rem;
     color: var(--admin-text-secondary);
 }
-.admin-tab.active {
-    background: var(--admin-primary);
-    color: white;
-}
-.admin-tab:hover:not(.active) {
-    background: #e4e6eb;
-}
-
-/* محتوى التبويب */
-.tab-content {
-    display: none;
-}
-.tab-content.active {
-    display: block;
-    animation: fadeIn 0.3s ease;
-}
+.admin-tab.active { background: var(--admin-primary); color: white; }
+.admin-tab:hover:not(.active) { background: #e4e6eb; }
+.tab-content { display: none; }
+.tab-content.active { display: block; animation: fadeIn 0.3s ease; }
 
 /* ---------- 6. النماذج ---------- */
-.form-group {
-    margin-bottom: 20px;
-}
+.form-group { margin-bottom: 20px; }
 .form-group label {
     display: block;
     margin-bottom: 8px;
@@ -231,13 +193,8 @@ a {
     border-color: var(--admin-primary);
     box-shadow: 0 0 0 3px rgba(196,139,76,0.1);
 }
-textarea.form-control {
-    resize: vertical;
-    min-height: 120px;
-}
-select.form-control {
-    cursor: pointer;
-}
+textarea.form-control { resize: vertical; min-height: 120px; }
+select.form-control { cursor: pointer; }
 
 /* ---------- 7. الأزرار ---------- */
 .btn {
@@ -253,39 +210,18 @@ select.form-control {
     transition: var(--admin-transition);
     font-size: 0.9rem;
 }
-.btn-primary {
-    background: var(--admin-primary);
-    color: white;
-}
-.btn-primary:hover {
-    background: var(--admin-primary-dark);
-}
-.btn-danger {
-    background: #e74c3c;
-    color: white;
-}
-.btn-danger:hover {
-    background: #c0392b;
-}
+.btn-primary { background: var(--admin-primary); color: white; }
+.btn-primary:hover { background: var(--admin-primary-dark); }
+.btn-danger { background: #e74c3c; color: white; }
+.btn-danger:hover { background: #c0392b; }
 .btn-outline {
     background: transparent;
     border: 2px solid var(--admin-primary);
     color: var(--admin-primary);
 }
-.btn-outline:hover {
-    background: var(--admin-primary);
-    color: white;
-}
-.btn-sm {
-    padding: 6px 14px;
-    font-size: 0.8rem;
-}
-.btn-group {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    margin: 15px 0;
-}
+.btn-outline:hover { background: var(--admin-primary); color: white; }
+.btn-sm { padding: 6px 14px; font-size: 0.8rem; }
+.btn-group { display: flex; gap: 10px; flex-wrap: wrap; margin: 15px 0; }
 
 /* ---------- 8. البطاقات والقوائم ---------- */
 .card {
@@ -311,26 +247,12 @@ select.form-control {
     border-bottom: 1px solid var(--admin-border);
     transition: background 0.2s;
 }
-.list-item:hover {
-    background: #fafafa;
-}
-.list-item:last-child {
-    border-bottom: none;
-}
-.list-item .item-info {
-    flex: 1;
-}
-.list-item .item-title {
-    font-weight: 700;
-}
-.list-item .item-meta {
-    font-size: 0.85rem;
-    color: var(--admin-text-secondary);
-}
-.list-item .item-actions {
-    display: flex;
-    gap: 8px;
-}
+.list-item:hover { background: #fafafa; }
+.list-item:last-child { border-bottom: none; }
+.list-item .item-info { flex: 1; }
+.list-item .item-title { font-weight: 700; }
+.list-item .item-meta { font-size: 0.85rem; color: var(--admin-text-secondary); }
+.list-item .item-actions { display: flex; gap: 8px; }
 
 /* ---------- 9. الجداول ---------- */
 .admin-table {
@@ -341,8 +263,7 @@ select.form-control {
     overflow: hidden;
     box-shadow: var(--admin-shadow);
 }
-.admin-table th,
-.admin-table td {
+.admin-table th, .admin-table td {
     padding: 12px 15px;
     text-align: right;
     border-bottom: 1px solid var(--admin-border);
@@ -352,54 +273,20 @@ select.form-control {
     font-weight: 700;
     color: var(--admin-text-secondary);
     font-size: 0.85rem;
-    text-transform: uppercase;
 }
-.admin-table tr:hover td {
-    background: #fefefe;
-}
+.admin-table tr:hover td { background: #fefefe; }
 
-/* ---------- 10. التنبيهات والرسائل ---------- */
+/* ---------- 10. التنبيهات ---------- */
 .alert {
     padding: 15px 20px;
     border-radius: var(--admin-radius-sm);
     margin: 15px 0;
     font-weight: 600;
 }
-.alert-success {
-    background: #d4edda;
-    color: #155724;
-    border: 1px solid #c3e6cb;
-}
-.alert-error {
-    background: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
-}
-.alert-info {
-    background: #d1ecf1;
-    color: #0c5460;
-    border: 1px solid #bee5eb;
-}
+.alert-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+.alert-error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
 
-/* ---------- 11. البحث والفلترة ---------- */
-.admin-search {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
-}
-.admin-search input {
-    flex: 1;
-    padding: 10px 15px;
-    border: 1px solid var(--admin-border);
-    border-radius: 25px;
-    font-family: var(--admin-font);
-    outline: none;
-}
-.admin-search input:focus {
-    border-color: var(--admin-primary);
-}
-
-/* ---------- 12. رفع الملفات ---------- */
+/* ---------- 11. رفع الملفات ---------- */
 .file-upload-area {
     border: 2px dashed var(--admin-border);
     border-radius: var(--admin-radius);
@@ -409,32 +296,17 @@ select.form-control {
     transition: var(--admin-transition);
     background: #fafafa;
 }
-.file-upload-area:hover {
-    border-color: var(--admin-primary);
-    background: #fef9f3;
-}
-.file-upload-area input[type="file"] {
-    display: none;
-}
-.file-preview {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    margin-top: 15px;
-}
+.file-upload-area:hover { border-color: var(--admin-primary); background: #fef9f3; }
+.file-preview { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 15px; }
 .file-preview img {
-    width: 80px;
-    height: 80px;
-    object-fit: cover;
-    border-radius: 8px;
+    width: 80px; height: 80px;
+    object-fit: cover; border-radius: 8px;
     border: 1px solid var(--admin-border);
 }
 
-/* ---------- 13. محرر المحتوى (مكان للـ Markdown Editor) ---------- */
+/* ---------- 12. محرر المحتوى ---------- */
 .editor-toolbar {
-    display: flex;
-    gap: 5px;
-    padding: 10px;
+    display: flex; gap: 5px; padding: 10px;
     background: #fafafa;
     border: 1px solid var(--admin-border);
     border-radius: var(--admin-radius-sm) var(--admin-radius-sm) 0 0;
@@ -449,20 +321,67 @@ select.form-control {
     font-family: var(--admin-font);
     transition: var(--admin-transition);
 }
-.editor-toolbar button:hover {
-    background: var(--admin-primary);
-    color: white;
-}
+.editor-toolbar button:hover { background: var(--admin-primary); color: white; }
 .editor-content {
-    min-height: 300px;
+    min-height: 200px;
     border: 1px solid var(--admin-border);
     border-top: none;
     border-radius: 0 0 var(--admin-radius-sm) var(--admin-radius-sm);
     padding: 15px;
-    font-family: monospace;
+    font-family: 'Fira Code', monospace;
     font-size: 0.95rem;
     outline: none;
     background: white;
+    direction: ltr;
+    text-align: left;
+}
+
+/* ---------- 13. النافذة المنبثقة ---------- */
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow-y: auto;
+    padding: 20px;
+}
+.modal-content {
+    background: white;
+    border-radius: 16px;
+    max-width: 750px;
+    width: 100%;
+    padding: 30px;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+}
+.modal-close {
+    position: absolute;
+    top: 15px; left: 15px;
+    font-size: 1.8rem;
+    cursor: pointer;
+    color: #999;
+    background: none;
+    border: none;
+}
+.modal-close:hover { color: #333; }
+.content-input-area { margin: 15px 0; }
+.added-items-list {
+    margin-top: 20px;
+    border-top: 1px solid #eee;
+    padding-top: 15px;
+}
+.added-items-list h4 { margin-bottom: 10px; }
+.modal-footer {
+    margin-top: 25px;
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    border-top: 1px solid #eee;
+    padding-top: 15px;
 }
 
 /* ---------- 14. الوضع الليلي للوحة التحكم ---------- */
@@ -474,92 +393,53 @@ body.dark-mode {
     --admin-border: #3e4042;
     --admin-shadow: 0 2px 8px rgba(0,0,0,0.4);
 }
-body.dark-mode .admin-sidebar {
-    background: #242526;
-    border-color: #3e4042;
-}
-body.dark-mode .admin-sidebar ul li:hover {
-    background: #3a3b3c;
-}
-body.dark-mode .admin-sidebar ul li.active {
-    background: #3a3b3c;
-}
-body.dark-mode .form-control {
-    background: #3a3b3c;
-    color: #e4e6eb;
-    border-color: #3e4042;
-}
+body.dark-mode .admin-sidebar { background: #242526; border-color: #3e4042; }
+body.dark-mode .admin-sidebar ul li:hover { background: #3a3b3c; }
+body.dark-mode .admin-sidebar ul li.active { background: #3a3b3c; }
+body.dark-mode .form-control { background: #3a3b3c; color: #e4e6eb; border-color: #3e4042; }
 body.dark-mode .card,
-body.dark-mode .admin-table {
-    background: #242526;
-}
-body.dark-mode .admin-table th {
-    background: #2a2a2a;
-}
+body.dark-mode .admin-table { background: #242526; }
+body.dark-mode .admin-table th { background: #2a2a2a; }
 body.dark-mode .list-item:hover,
-body.dark-mode .admin-table tr:hover td {
-    background: #2a2a2a;
-}
-body.dark-mode .editor-toolbar {
-    background: #2a2a2a;
-    border-color: #3e4042;
-}
-body.dark-mode .editor-toolbar button {
-    background: #3a3b3c;
-    color: #e4e6eb;
-    border-color: #3e4042;
-}
-body.dark-mode .file-upload-area {
-    background: #2a2a2a;
-    border-color: #3e4042;
-}
+body.dark-mode .admin-table tr:hover td { background: #2a2a2a; }
+body.dark-mode .editor-toolbar { background: #2a2a2a; border-color: #3e4042; }
+body.dark-mode .editor-toolbar button { background: #3a3b3c; color: #e4e6eb; border-color: #3e4042; }
+body.dark-mode .editor-content { background: #1e1e1e; color: #d4d4d4; }
+body.dark-mode .modal-content { background: #242526; }
+body.dark-mode .added-items-list { border-color: #3e4042; }
+body.dark-mode .modal-footer { border-color: #3e4042; }
 
 /* ---------- 15. تجاوب الجوال ---------- */
 @media (max-width: 768px) {
     .admin-sidebar {
         position: fixed;
-        top: 0;
-        right: -100%;
-        width: 80%;
-        max-width: 300px;
+        top: 0; right: -100%;
+        width: 80%; max-width: 300px;
         z-index: 200;
     }
-    .admin-sidebar.open {
-        right: 0;
-    }
-    #content-panel {
-        margin-right: 0;
-        padding: 20px;
-    }
+    .admin-sidebar.open { right: 0; }
+    #content-panel { margin-right: 0; padding: 20px; }
     .mobile-toggle {
         display: block;
         position: fixed;
-        top: 15px;
-        right: 15px;
+        top: 15px; right: 15px;
         z-index: 300;
         background: var(--admin-primary);
-        color: white;
-        border: none;
+        color: white; border: none;
         padding: 10px 14px;
         border-radius: 50%;
         font-size: 1.3rem;
         cursor: pointer;
     }
-    .btn-group {
-        flex-direction: column;
-    }
-    .admin-search {
-        flex-direction: column;
-    }
+    .btn-group { flex-direction: column; }
+    .modal-content { max-width: 95%; padding: 20px; }
 }
 @media (min-width: 769px) {
-    .mobile-toggle {
-        display: none;
-    }
+    .mobile-toggle { display: none; }
 }
 
 /* ---------- 16. حركات ---------- */
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(5px); }
     to { opacity: 1; transform: translateY(0); }
-  }
+                          }
