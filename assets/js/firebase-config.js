@@ -23,7 +23,7 @@ const db = firebase.firestore();       // قاعدة البيانات (Firestore
 const auth = firebase.auth();          // المصادقة (تسجيل الدخول)
 const storage = firebase.storage();    // التخزين السحابي (رفع الصور والملفات)
 
-// إعدادات إضافية لـ Firestore لتحسين الأداء (اختياري)
+// إعدادات إضافية لـ Firestore لتحسين الأداء
 db.settings({
   merge: true,
   ignoreUndefinedProperties: true
