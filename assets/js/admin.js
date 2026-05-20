@@ -1,8 +1,8 @@
 // ============================================================
-//  ملف: admin.js (كامل ومدمج)
+//  ملف: admin.js (مُحدّث - كامل)
 //  الوظيفة: إدارة لوحة التحكم وعمليات CRUD على جميع المجموعات
-//  يشمل: الهيدر، البدي، الفوتر، التبويبات، المنشورات، الكتّاب، المفاتيح
-//         ونافذة إضافة منشور جديدة مع تبويبات أنواع المحتوى واختيار التبويبة والفرع
+//  يشمل: الهيدر، البدي، الفوتر، التبويبات، المنشورات (مع اختيار
+//         التبويبة والفرع والكاتب)، الكتّاب، المفاتيح
 //  يعتمد على: firebase-config.js, utils.js
 // ============================================================
 
@@ -333,12 +333,20 @@ async function showAddPostForm() {
     selectedCategoryId = null;
     selectedSubcategoryId = null;
 
-    // جلب التبويبات من Firestore
+    // جلب التبويبات
     const catsSnapshot = await db.collection('categories').orderBy('order').get();
     let catOptions = '<option value="">-- اختر التبويبة --</option>';
     catsSnapshot.forEach(doc => {
         const cat = doc.data();
         catOptions += `<option value="${doc.id}">${cat.icon || '📌'} ${cat.name}</option>`;
+    });
+
+    // جلب الكتّاب
+    const authorsSnapshot = await db.collection('authors').orderBy('name').get();
+    let authorOptions = '<option value="">-- اختر الكاتب (اختياري) --</option>';
+    authorsSnapshot.forEach(doc => {
+        const author = doc.data();
+        authorOptions += `<option value="${doc.id}">${author.name}</option>`;
     });
 
     const modalHTML = `
@@ -363,6 +371,13 @@ async function showAddPostForm() {
           <label>الفرع</label>
           <select id="postSubcategory" class="form-control">
             <option value="">الكل</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>الكاتب</label>
+          <select id="postAuthor" class="form-control">
+            ${authorOptions}
           </select>
         </div>
 
@@ -572,7 +587,6 @@ async function saveNewPost() {
     const mainTitle = document.getElementById('postMainTitle').value.trim();
     if (!mainTitle) return alert('أدخل العنوان الرئيسي');
 
-    // قراءة التبويبة والفرع من الحقول الظاهرة
     const catSelect = document.getElementById('postCategory');
     const subSelect = document.getElementById('postSubcategory');
     const categoryId = catSelect?.value || null;
@@ -581,12 +595,40 @@ async function saveNewPost() {
     if (!categoryId) return alert('اختر التبويبة');
     if (postContentItems.length === 0) return alert('أضف عنصراً واحداً على الأقل');
 
+    // جلب اسم التبويبة والفرع
+    let categoryName = '';
+    let subcategoryName = '';
+    if (categoryId) {
+        const catDoc = await db.collection('categories').doc(categoryId).get();
+        if (catDoc.exists) {
+            categoryName = catDoc.data().name;
+            if (subcategoryId) {
+                const subs = catDoc.data().subcategories || [];
+                const sub = subs.find(s => s.id === subcategoryId);
+                if (sub) subcategoryName = sub.name;
+            }
+        }
+    }
+
+    // جلب اسم الكاتب
+    let authorName = 'مجهول';
+    let authorId = null;
+    const authorSelect = document.getElementById('postAuthor');
+    if (authorSelect && authorSelect.value) {
+        authorId = authorSelect.value;
+        const authorDoc = await db.collection('authors').doc(authorId).get();
+        if (authorDoc.exists) authorName = authorDoc.data().name;
+    }
+
     await db.collection('posts').add({
         title: mainTitle,
         content: postContentItems,
-        author: 'مجهول',
+        author: authorName,
+        authorId: authorId,
         category: categoryId,
         subcategory: subcategoryId,
+        categoryName: categoryName,
+        subcategoryName: subcategoryName,
         date: new Date().toISOString(),
         likes: 0,
         likedBy: [],
@@ -695,5 +737,4 @@ async function renderKeys() {
     }).join('');
 }
 
-// ---------- 13. تأكيد التحميل ----------
-console.log("✅ ملف admin.js تم تحميله بنجاح - جميع الأقسام جاهزة");
+console.log("✅ admin.js تم تحميله بنجاح");
