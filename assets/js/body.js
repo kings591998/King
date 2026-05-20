@@ -138,6 +138,9 @@ async function createPostCard(post, titleFont = 'Playfair Display', bodyFont = '
           // تحويل بسيط للنص (يمكن استخدام مكتبة markdown-it لاحقاً)
           contentHTML += `<div class="markdown-content">${item.value.replace(/\n/g, '<br>')}</div>`;
           break;
+        case 'markdown':
+          contentHTML += `<div class="markdown-content">${parseMarkdown(item.value)}</div>`;
+          break;
         case 'html':
           contentHTML += `<div class="html-content">${item.value}</div>`;
           break;
