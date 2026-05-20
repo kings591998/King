@@ -1,8 +1,8 @@
 // ============================================================
-//  ملف: admin.js (مُحدّث)
+//  ملف: admin.js (كامل ومدمج)
 //  الوظيفة: إدارة لوحة التحكم وعمليات CRUD على جميع المجموعات
 //  يشمل: الهيدر، البدي، الفوتر، التبويبات، المنشورات، الكتّاب، المفاتيح
-//         ونافذة إضافة منشور جديدة مع تبويبات لأنواع المحتوى
+//         ونافذة إضافة منشور جديدة مع تبويبات أنواع المحتوى واختيار التبويبة والفرع
 //  يعتمد على: firebase-config.js, utils.js
 // ============================================================
 
@@ -10,8 +10,10 @@
 let adminCurrentSection = 'header';
 let isAdminLoggedIn = false;
 
-// متغيرات خاصة بنافذة إضافة المنشور
-let postContentItems = [];           // العناصر المضافة للمنشور الحالي
+// خاصة بنافذة إضافة المنشور
+let postContentItems = [];
+let selectedCategoryId = null;
+let selectedSubcategoryId = null;
 
 // ---------- 2. التحقق من الجلسة عند التحميل ----------
 document.addEventListener('DOMContentLoaded', () => {
@@ -313,7 +315,7 @@ async function renderCategories() {
     container.innerHTML = html;
 }
 
-// ---------- 10. المنشورات (مع نافذة الإضافة الجديدة) ----------
+// ---------- 10. المنشورات (مع نافذة الإضافة المطورة) ----------
 async function loadPostsSection(panel) {
     panel.innerHTML = `
         <h2>إدارة المنشورات</h2>
@@ -325,18 +327,45 @@ async function loadPostsSection(panel) {
     await renderPostsList();
 }
 
-// ---- نافذة إضافة المنشور ----
-function showAddPostForm() {
+// ---- دوال نافذة إضافة المنشور ----
+async function showAddPostForm() {
     postContentItems = [];
+    selectedCategoryId = null;
+    selectedSubcategoryId = null;
+
+    // جلب التبويبات من Firestore
+    const catsSnapshot = await db.collection('categories').orderBy('order').get();
+    let catOptions = '<option value="">-- اختر التبويبة --</option>';
+    catsSnapshot.forEach(doc => {
+        const cat = doc.data();
+        catOptions += `<option value="${doc.id}">${cat.icon || '📌'} ${cat.name}</option>`;
+    });
+
     const modalHTML = `
     <div id="addPostModal" class="modal-overlay">
       <div class="modal-content">
         <button class="modal-close" onclick="closeAddPostModal()">✕</button>
         <h3>إضافة منشور جديد</h3>
+
         <div class="form-group">
           <label>العنوان الرئيسي</label>
           <input type="text" id="postMainTitle" class="form-control" placeholder="أدخل عنوان المنشور">
         </div>
+
+        <div class="form-group">
+          <label>التبويبة</label>
+          <select id="postCategory" class="form-control" onchange="onCategoryChange()">
+            ${catOptions}
+          </select>
+        </div>
+
+        <div class="form-group" id="subcategoryGroup" style="display:none;">
+          <label>الفرع</label>
+          <select id="postSubcategory" class="form-control">
+            <option value="">الكل</option>
+          </select>
+        </div>
+
         <div class="admin-tabs" id="contentTypeTabs">
           <button class="admin-tab active" data-type="subtitle">عنوان فرعي</button>
           <button class="admin-tab" data-type="images">صور</button>
@@ -345,18 +374,22 @@ function showAddPostForm() {
           <button class="admin-tab" data-type="markdown">مقال (Markdown)</button>
           <button class="admin-tab" data-type="html">مقال (HTML)</button>
         </div>
+
         <div id="contentInputArea" class="content-input-area"></div>
         <button class="btn btn-primary" id="addContentItemBtn">➕ أضف إلى المحتوى</button>
+
         <div class="added-items-list">
           <h4>العناصر المضافة:</h4>
           <div id="addedItemsContainer"></div>
         </div>
+
         <div class="modal-footer">
           <button class="btn btn-primary" onclick="saveNewPost()">💾 نشر المنشور</button>
           <button class="btn btn-outline" onclick="closeAddPostModal()">إلغاء</button>
         </div>
       </div>
     </div>`;
+
     document.body.insertAdjacentHTML('beforeend', modalHTML);
     switchContentType('subtitle');
     setupContentTabs();
@@ -367,6 +400,39 @@ function closeAddPostModal() {
     if (modal) modal.remove();
 }
 
+async function onCategoryChange() {
+    const catId = document.getElementById('postCategory').value;
+    selectedCategoryId = catId || null;
+    selectedSubcategoryId = null;
+
+    const subGroup = document.getElementById('subcategoryGroup');
+    const subSelect = document.getElementById('postSubcategory');
+
+    if (!catId) {
+        subGroup.style.display = 'none';
+        return;
+    }
+
+    const catDoc = await db.collection('categories').doc(catId).get();
+    if (!catDoc.exists) {
+        subGroup.style.display = 'none';
+        return;
+    }
+
+    const cat = catDoc.data();
+    const subs = cat.subcategories || [];
+    if (subs.length === 0) {
+        subGroup.style.display = 'none';
+        return;
+    }
+
+    subSelect.innerHTML = '<option value="">الكل</option>';
+    subs.forEach(sub => {
+        subSelect.innerHTML += `<option value="${sub.id}">${sub.name}</option>`;
+    });
+    subGroup.style.display = 'block';
+}
+
 function setupContentTabs() {
     document.querySelectorAll('#contentTypeTabs .admin-tab').forEach(tab => {
         tab.addEventListener('click', () => {
@@ -375,6 +441,7 @@ function setupContentTabs() {
             switchContentType(tab.dataset.type);
         });
     });
+
     document.getElementById('addContentItemBtn').addEventListener('click', () => {
         const activeTab = document.querySelector('#contentTypeTabs .admin-tab.active');
         if (activeTab) addContentItem(activeTab.dataset.type);
@@ -450,7 +517,7 @@ function addContentItem(type) {
                 document.getElementById('imageFiles').value = '';
                 document.getElementById('imagePreview').innerHTML = '';
             });
-            return;
+            return; // منع الإضافة المباشرة
         case 'code':
             const lang = document.getElementById('codeLanguage').value;
             const codeVal = document.getElementById('codeContent').value.trim();
@@ -504,14 +571,22 @@ function removeContentItem(index) {
 async function saveNewPost() {
     const mainTitle = document.getElementById('postMainTitle').value.trim();
     if (!mainTitle) return alert('أدخل العنوان الرئيسي');
+
+    // قراءة التبويبة والفرع من الحقول الظاهرة
+    const catSelect = document.getElementById('postCategory');
+    const subSelect = document.getElementById('postSubcategory');
+    const categoryId = catSelect?.value || null;
+    const subcategoryId = (subSelect && subSelect.style.display !== 'none') ? (subSelect.value || null) : null;
+
+    if (!categoryId) return alert('اختر التبويبة');
     if (postContentItems.length === 0) return alert('أضف عنصراً واحداً على الأقل');
 
     await db.collection('posts').add({
         title: mainTitle,
         content: postContentItems,
         author: 'مجهول',
-        category: currentCategoryId || null,
-        subcategory: currentSubcategoryId || null,
+        category: categoryId,
+        subcategory: subcategoryId,
         date: new Date().toISOString(),
         likes: 0,
         likedBy: [],
@@ -621,4 +696,4 @@ async function renderKeys() {
 }
 
 // ---------- 13. تأكيد التحميل ----------
-console.log("✅ ملف admin.js تم تحميله بنجاح");
+console.log("✅ ملف admin.js تم تحميله بنجاح - جميع الأقسام جاهزة");
