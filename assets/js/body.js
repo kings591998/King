@@ -234,11 +234,22 @@ async function createPostCard(post, titleFont = 'Playfair Display', bodyFont = '
 // ---------- توسيع البطاقة (قراءة المزيد) ----------
 function expandPost(postId) {
   const postBody = document.querySelector(`#post-${postId} .post-body`);
+  const readMoreBtn = document.querySelector(`#post-${postId} .read-more`);
+  
   if (postBody) {
+    // تبديل حالة التوسيع (يضيف أو يزيل كلاس expanded)
     postBody.classList.toggle('expanded');
-    // التمرير إلى بداية البطاقة إذا توسعت
+    
+    // إذا أصبحت البطاقة موسعة
     if (postBody.classList.contains('expanded')) {
-      document.getElementById(`post-${postId}`).scrollIntoView({ behavior: 'smooth', block: 'start' });
+      // إخفاء زر "اقرأ المزيد" لأن المحتوى ظاهر بالكامل
+      if (readMoreBtn) readMoreBtn.style.display = 'none';
+      // التمرير إلى بداية البطاقة بشكل سلس
+      const card = document.getElementById(`post-${postId}`);
+      if (card) card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else {
+      // إذا تم طي البطاقة مرة أخرى، نُظهر زر "اقرأ المزيد"
+      if (readMoreBtn) readMoreBtn.style.display = 'inline-block';
     }
   }
 }
