@@ -1,6 +1,7 @@
 // ============================================================
-//  ملف: header.js (مُحدّث - كامل)
+//  ملف: header.js (مُدمَج - كامل ومُحدّث)
 //  الوظيفة: بناء الهيدر وإدارة التبويبات والبحث والوضع الليلي
+//  يشمل: خلفية الهيدر، أيقونات، اختفاء تلقائي، هامبرغر
 //  يعتمد على: firebase-config.js, utils.js
 // ============================================================
 
@@ -18,12 +19,25 @@ async function buildHeader() {
     const titleFont = settings.titleFont || 'Playfair Display';
     const bodyFont = settings.bodyFont || 'Cairo';
     const darkMode = settings.darkMode || false;
+    const headerBgImage = settings.headerBgImage || '';
 
     const catsSnapshot = await db.collection('categories').orderBy('order').get();
     categoriesData = [];
     catsSnapshot.forEach(doc => categoriesData.push({ id: doc.id, ...doc.data() }));
 
     const headerDiv = document.getElementById('site-header');
+
+    // تطبيق الخلفية
+    if (headerBgImage) {
+        headerDiv.style.backgroundImage = `url('${headerBgImage}')`;
+        headerDiv.style.backgroundSize = 'cover';
+        headerDiv.style.backgroundPosition = 'center';
+        headerDiv.classList.add('has-bg-image');
+    } else {
+        headerDiv.style.backgroundImage = '';
+        headerDiv.classList.remove('has-bg-image');
+    }
+
     headerDiv.innerHTML = `
         <div class="header-top">
             <div class="logo" style="color:${primaryColor}; font-family:'${titleFont}', serif;" onclick="goHome()">${siteName}</div>
@@ -40,10 +54,10 @@ async function buildHeader() {
         <div class="nav-container" id="navContainer">
             <div class="nav-tabs-wrapper" id="navTabsWrapper">
                 <div class="nav-tabs" id="mainTabs">
-                    <div class="tab-item ${!currentCategoryId ? 'active' : ''}" onclick="handleTabClick(event, null)"> الرئيسية</div>
+                    <div class="tab-item ${!currentCategoryId ? 'active' : ''}" onclick="handleTabClick(event, null)">🏠 الرئيسية</div>
                     ${categoriesData.map(cat => `
                         <div class="tab-item" data-id="${cat.id}" onclick="handleTabClick(event, '${cat.id}')">
-                            ${cat.icon || ''} ${cat.name} ${cat.subcategories && cat.subcategories.length ? '▾' : ''}
+                            ${cat.icon || '📌'} ${cat.name} ${cat.subcategories && cat.subcategories.length ? '▾' : ''}
                         </div>
                     `).join('')}
                 </div>
