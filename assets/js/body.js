@@ -1,8 +1,7 @@
 // ============================================================
-//  ملف: body.js (مُدمَج - كامل ومُحدّث)
+//  ملف: body.js (مُحدّث - تم حذف أزرار القائمة)
 //  الوظيفة: عرض المقالات والتفاعلات (إعجاب، تعليق، مشاركة،
-//         تلخيص AI، بحث داخل المقال، تمييز، مصادر، وسام،
-//         تعديل/حذف التعليقات، شريط تقدم، نافذة الكاتب،
+//         بحث داخل المقال، شريط تقدم، نافذة الكاتب،
 //         فلترة الكاتب، ترجمة ديناميكية، تصفح)
 //  يعتمد على: firebase-config.js, utils.js, header.js
 // ============================================================
@@ -153,15 +152,7 @@ async function createPostCard(post, titleFont = 'Playfair Display', bodyFont = '
         <div class="post-options">
             <button class="icon-btn dropdown-btn" onclick="togglePostMenu(event, '${post.id}')">⋯</button>
             <div class="dropdown-menu" id="menu-${post.id}" style="display:none;">
-                <div class="dropdown-item" onclick="copyPostLink('${post.id}')">🔗 نسخ الرابط</div>
-                <div class="dropdown-item" onclick="saveForLater('${post.id}')">🔖 قراءة لاحقاً</div>
-                <div class="dropdown-item ai-summary-btn" onclick="generateSummary('${post.id}')">🤖 تلخيص بالذكاء الاصطناعي</div>
                 <div class="dropdown-item search-in-post-btn" onclick="searchInPost('${post.id}')">🔎 بحث داخل المقال</div>
-                <div class="dropdown-item highlight-text-btn" onclick="highlightSelection('${post.id}')">🖍️ تمييز النص</div>
-                <div class="dropdown-item show-references-btn" onclick="showReferences('${post.id}')">📊 عرض المصادر والمراجع</div>
-                <div class="dropdown-item" onclick="filterByAuthor('${authorId}')">📄 مقالات الكاتب</div>
-                <div class="dropdown-item" onclick="toggleFontSize('${post.id}')">🔤 تكبير/تصغير الخط</div>
-                <div class="dropdown-item" onclick="reportPost('${post.id}')">🚩 إبلاغ</div>
             </div>
         </div>
     </div>
@@ -180,11 +171,6 @@ async function createPostCard(post, titleFont = 'Playfair Display', bodyFont = '
         <div class="post-content">${contentHTML}</div>
         <span class="read-more-btn" onclick="expandPost('${post.id}')">📖 اقرأ المزيد</span>
         <span class="collapse-btn" style="display:none;" onclick="expandPost('${post.id}')">▲ طي المقال</span>
-    </div>
-
-    <div class="ai-summary-box" id="summary-${post.id}" style="display:none;">
-        <div class="ai-summary-header"><span>🤖 ملخص الذكاء الاصطناعي</span><button class="ai-summary-close" onclick="closeSummary('${post.id}')">✕</button></div>
-        <div class="ai-summary-content" id="summary-content-${post.id}">⏳ جارٍ التوليد...</div>
     </div>
 
     <div class="search-in-post-box" id="searchBox-${post.id}" style="display:none;">
@@ -497,106 +483,6 @@ function clearHighlights(postId) {
   });
 }
 
-// ---------- تمييز النص ----------
-function getHighlights(postId) { return JSON.parse(localStorage.getItem('highlights') || '{}')[postId] || []; }
-function saveHighlights(postId, highlights) {
-  const all = JSON.parse(localStorage.getItem('highlights') || '{}');
-  all[postId] = highlights; localStorage.setItem('highlights', JSON.stringify(all));
-}
-function highlightSelection(postId) {
-  const selection = window.getSelection();
-  if (!selection.rangeCount || selection.isCollapsed) return alert('الرجاء تحديد نص أولاً.');
-  const range = selection.getRangeAt(0);
-  const postBody = document.querySelector(`#post-${postId} .post-content`);
-  if (!postBody || !postBody.contains(range.commonAncestorContainer)) return alert('يجب أن يكون النص داخل المقال.');
-  const selectedText = range.toString().trim();
-  if (!selectedText) return;
-  let mark;
-  try {
-    mark = document.createElement('mark'); mark.className = 'user-highlight';
-    mark.style.backgroundColor = '#ffeb3b'; mark.dataset.postId = postId; mark.dataset.highlightText = selectedText;
-    range.surroundContents(mark);
-  } catch (e) {
-    const span = document.createElement('span'); span.className = 'user-highlight';
-    span.style.backgroundColor = '#ffeb3b'; span.dataset.postId = postId; span.dataset.highlightText = selectedText;
-    range.surroundContents(span);
-    mark = span;
-  }
-  selection.removeAllRanges();
-  const highlights = getHighlights(postId); highlights.push({ text: selectedText }); saveHighlights(postId, highlights);
-  if (mark) {
-    mark.addEventListener('click', function(e) {
-      if (confirm('إلغاء تمييز هذا النص؟')) {
-        this.parentNode.replaceChild(document.createTextNode(this.textContent), this);
-        this.parentNode.normalize();
-        saveHighlights(postId, getHighlights(postId).filter(h => h.text !== selectedText));
-      }
-    });
-  }
-  closeAllMenus();
-}
-
-// ---------- المصادر والمراجع ----------
-function showReferences(postId) {
-  document.querySelectorAll('.references-box').forEach(b => b.remove());
-  const postBody = document.querySelector(`#post-${postId} .post-body`);
-  if (!postBody) return;
-  const links = postBody.querySelectorAll('a[href]');
-  const urls = Array.from(links).map(l => ({ href: l.href, text: l.textContent.trim() || l.href })).filter(i => i.href && !i.href.startsWith('javascript'));
-  if (urls.length === 0) return alert('لا توجد روابط.');
-  const unique = [...new Map(urls.map(i => [i.href, i])).values()];
-  let html = '<ul class="references-list">';
-  unique.forEach(u => html += `<li><a href="${u.href}" target="_blank">🔗 ${u.text}</a></li>`);
-  html += '</ul>';
-  const box = document.createElement('div'); box.className = 'references-box';
-  box.innerHTML = `<div class="references-header"><span>📊 المصادر (${unique.length})</span><button class="references-close" onclick="this.parentElement.parentElement.remove()">✕</button></div>${html}`;
-  postBody.appendChild(box);
-}
-
-// ---------- وسام القارئ ----------
-function getBadgeLevel(interactions) {
-  if (interactions >= 100) return { name: 'أسطورة', icon: '👑' };
-  if (interactions >= 50) return { name: 'خبير', icon: '⭐' };
-  if (interactions >= 20) return { name: 'نشط', icon: '🔥' };
-  if (interactions >= 5) return { name: 'مشارك', icon: '💬' };
-  return null;
-}
-function addInteraction(type) {
-  const key = `interactions_${getVisitorId()}`;
-  let interactions = JSON.parse(localStorage.getItem(key) || '{"comments":0,"likes":0}');
-  if (type === 'comment') interactions.comments++;
-  else if (type === 'like') interactions.likes++;
-  localStorage.setItem(key, JSON.stringify(interactions));
-}
-
-// ---------- تلخيص AI ----------
-async function generateSummary(postId) {
-  const box = document.getElementById(`summary-${postId}`);
-  const content = document.getElementById(`summary-content-${postId}`);
-  if (!box || !content) return;
-  box.style.display = 'block'; content.innerHTML = '⏳ جارٍ التوليد...';
-  const postBody = document.querySelector(`#post-${postId} .post-content`);
-  if (!postBody) { content.innerHTML = '❌ لم يتم العثور على محتوى.'; return; }
-  const fullText = postBody.innerText.trim().substring(0, 3000);
-  if (fullText.length < 50) { content.innerHTML = '⚠️ المقال قصير جداً.'; return; }
-  let apiKey = '';
-  try {
-    const keysSnap = await db.collection('api_keys').where('type', '==', 'ai').limit(1).get();
-    if (!keysSnap.empty) apiKey = keysSnap.docs[0].data().value;
-  } catch (e) {}
-  if (!apiKey) apiKey = await getSetting('openai_api_key', '');
-  if (!apiKey) { content.innerHTML = '⚠️ لم يتم تعيين مفتاح API.'; return; }
-  try {
-    const res = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
-      body: JSON.stringify({ model: 'gpt-3.5-turbo', messages: [{ role: 'system', content: 'لخّص هذا المقال العربي في 3 جمل فقط.' }, { role: 'user', content: fullText }], max_tokens: 200, temperature: 0.5 })
-    });
-    const data = await res.json();
-    content.innerHTML = data.error ? `❌ ${data.error.message}` : data.choices[0].message.content;
-  } catch (e) { content.innerHTML = '❌ فشل الاتصال.'; }
-}
-function closeSummary(postId) { const box = document.getElementById(`summary-${postId}`); if (box) box.style.display = 'none'; }
-
 // ---------- نافذة الكاتب ----------
 async function showAuthorBio(authorId, postId) {
   if (!authorId) return;
@@ -671,27 +557,6 @@ function filterBySubcategory(catId, subId) {
   else { window.currentCategoryId = catId; window.currentSubcategoryId = subId; loadPosts(1); }
 }
 function searchPosts(query) { currentSearchQuery = query.trim(); currentPage = 1; loadPosts(1); }
-
-// ---------- تكبير/تصغير الخط ----------
-function toggleFontSize(postId) {
-    const postContent = document.querySelector(`#post-${postId} .post-content`);
-    if (!postContent) return;
-    const currentSize = postContent.style.fontSize;
-    if (!currentSize || currentSize === '0.95rem') {
-        postContent.style.fontSize = '1.25rem';
-        postContent.style.lineHeight = '2';
-        showToast('🔤 حجم الخط: كبير', 'info', 1500);
-    } else if (currentSize === '1.25rem') {
-        postContent.style.fontSize = '1.5rem';
-        postContent.style.lineHeight = '2.2';
-        showToast('🔤 حجم الخط: كبير جداً', 'info', 1500);
-    } else {
-        postContent.style.fontSize = '0.95rem';
-        postContent.style.lineHeight = '1.8';
-        showToast('🔤 حجم الخط: عادي', 'info', 1500);
-    }
-    closeAllMenus();
-}
 
 // ---------- شريط تقدم القراءة ----------
 function updateReadingProgress(postId) {
