@@ -1,12 +1,12 @@
 // ============================================================
 //  ملف: header.js (مُدمَج - كامل ومُحدّث)
 //  الوظيفة: بناء الهيدر وإدارة التبويبات والبحث والوضع الليلي
-//  يشمل: خلفية شفافة، شعار CC، شريط أخبار، إشعارات، بروفايل
+//  يشمل: خلفية شفافة، شعار CC، إشعارات، بروفايل
 //  يعتمد على: firebase-config.js, utils.js
 // ============================================================
 
-let currentCategoryId = null;
-let currentSubcategoryId = null;
+window.currentCategoryId = null;
+window.currentSubcategoryId = null;
 let categoriesData = [];
 
 // ---------- الدالة الرئيسية ----------
@@ -24,7 +24,6 @@ async function buildHeader() {
 
     const headerDiv = document.getElementById('site-header');
 
-    // تطبيق الخلفية
     if (headerBgImage) {
         headerDiv.style.backgroundImage = `url('${headerBgImage}')`;
         headerDiv.style.backgroundSize = 'cover';
@@ -35,7 +34,6 @@ async function buildHeader() {
         headerDiv.classList.remove('has-bg-image');
     }
 
-    // بناء HTML الهيدر
     headerDiv.innerHTML = `
         <div class="header-top">
             <div class="logo" onclick="goHome()">
@@ -62,7 +60,7 @@ async function buildHeader() {
         </div>
         <div class="nav-container" id="navContainer">
             <div class="nav-tabs" id="mainTabs">
-                <div class="tab-item ${!currentCategoryId ? 'active' : ''}" onclick="handleTabClick(event, null)">🏠 الرئيسية</div>
+                <div class="tab-item ${!window.currentCategoryId ? 'active' : ''}" onclick="handleTabClick(event, null)">🏠 الرئيسية</div>
                 ${categoriesData.map(cat => `
                     <div class="tab-item" data-id="${cat.id}" onclick="handleTabClick(event, '${cat.id}')">
                         ${cat.name} ${cat.subcategories && cat.subcategories.length ? '▾' : ''}
@@ -71,23 +69,13 @@ async function buildHeader() {
             </div>
             <div class="subcategory-bar" id="subcategoryBar" style="display:none;"></div>
         </div>
-        <div class="breaking-news-bar" id="breakingNewsBar">
-            <div class="breaking-fixed-badge">جديد!</div>
-            <div class="breaking-news-content" id="breakingNewsContent">
-                <span class="breaking-item">⏳ جاري تحميل المقالات...</span>
-            </div>
-        </div>
     `;
 
     attachHeaderEvents();
     if (darkMode) document.body.classList.add('dark-mode');
-    loadBreakingNews();
-    setInterval(loadBreakingNews, 60000);
 }
 
-// ---------- ربط الأحداث ----------
 function attachHeaderEvents() {
-    // أيقونة البحث
     document.getElementById('searchToggle').addEventListener('click', () => {
         const bar = document.getElementById('searchBar');
         bar.style.display = 'flex';
@@ -116,13 +104,11 @@ function attachHeaderEvents() {
         });
     }
 
-    // زر البحث
     document.getElementById('searchBtn').addEventListener('click', () => {
         const query = document.getElementById('searchInput').value.trim();
         if (typeof searchPosts === 'function') searchPosts(query);
     });
 
-    // أيقونة الإشعارات
     document.getElementById('notificationBell').addEventListener('click', (e) => {
         e.stopPropagation();
         const existing = document.getElementById('notifications-dropdown');
@@ -130,7 +116,6 @@ function attachHeaderEvents() {
         loadNotifications();
     });
 
-    // أيقونة البروفايل
     document.getElementById('profileBtn').addEventListener('click', (e) => {
         e.stopPropagation();
         const menu = document.getElementById('profile-dropdown');
@@ -160,10 +145,8 @@ function attachHeaderEvents() {
         }, 10);
     });
 
-    // الوضع الليلي
     document.getElementById('darkModeBtn').addEventListener('click', toggleDarkMode);
 
-    // إغلاق شريط البحث عند النقر خارجه
     document.addEventListener('click', (e) => {
         const bar = document.getElementById('searchBar');
         const toggle = document.getElementById('searchToggle');
@@ -173,12 +156,11 @@ function attachHeaderEvents() {
     });
 }
 
-// ---------- التبويبات والفروع ----------
 function handleTabClick(event, catId) {
-    if (currentCategoryId === catId && document.getElementById('subcategoryBar').style.display !== 'none') {
+    if (window.currentCategoryId === catId && document.getElementById('subcategoryBar').style.display !== 'none') {
         hideSubcategories();
-        currentCategoryId = null;
-        currentSubcategoryId = null;
+        window.currentCategoryId = null;
+        window.currentSubcategoryId = null;
         document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
         const homeTab = document.querySelector('.tab-item[onclick*="null"]');
         if (homeTab) homeTab.classList.add('active');
@@ -189,8 +171,8 @@ function handleTabClick(event, catId) {
 
     document.querySelectorAll('.tab-item').forEach(tab => tab.classList.remove('active'));
     event.target.classList.add('active');
-    currentCategoryId = catId;
-    currentSubcategoryId = null;
+    window.currentCategoryId = catId;
+    window.currentSubcategoryId = null;
     const category = categoriesData.find(c => c.id === catId);
     if (category && category.subcategories && category.subcategories.length > 0) {
         showSubcategories(category.subcategories);
@@ -205,10 +187,10 @@ function showSubcategories(subcategories) {
     const bar = document.getElementById('subcategoryBar');
     let html = '<div class="subcategory-list">';
     html += `<span class="sub-item sub-close-btn" onclick="hideSubcategoriesAndReset()" title="إغلاق الفروع">✕</span>`;
-    html += `<span class="sub-item ${!currentSubcategoryId ? 'active' : ''}" onclick="selectSubcategory(null)">الكل</span>`;
+    html += `<span class="sub-item ${!window.currentSubcategoryId ? 'active' : ''}" onclick="selectSubcategory(null)">الكل</span>`;
     subcategories.forEach((sub, index) => {
         const subId = sub.id || `sub-${index}`;
-        html += `<span class="sub-item ${currentSubcategoryId === subId ? 'active' : ''}" onclick="selectSubcategory('${subId}')">${sub.name || sub}</span>`;
+        html += `<span class="sub-item ${window.currentSubcategoryId === subId ? 'active' : ''}" onclick="selectSubcategory('${subId}')">${sub.name || sub}</span>`;
     });
     html += '</div>';
     bar.innerHTML = html;
@@ -221,12 +203,12 @@ function hideSubcategories() {
 
 function hideSubcategoriesAndReset() {
     hideSubcategories();
-    currentSubcategoryId = null;
+    window.currentSubcategoryId = null;
     if (typeof loadPosts === 'function') loadPosts(1);
 }
 
 function selectSubcategory(subId) {
-    currentSubcategoryId = subId;
+    window.currentSubcategoryId = subId;
     document.querySelectorAll('.sub-item').forEach(item => item.classList.remove('active'));
     if (subId === null) {
         document.querySelector('.sub-item[onclick*="null"]')?.classList.add('active');
@@ -237,10 +219,9 @@ function selectSubcategory(subId) {
     scrollToPosts();
 }
 
-// ---------- البحث والتنقل ----------
 function goHome() {
-    currentCategoryId = null;
-    currentSubcategoryId = null;
+    window.currentCategoryId = null;
+    window.currentSubcategoryId = null;
     hideSubcategories();
     document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
     document.querySelector('.tab-item[onclick*="null"]')?.classList.add('active');
@@ -253,14 +234,12 @@ function scrollToPosts() {
     if (feed) feed.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-// ---------- الوضع الليلي ----------
 async function toggleDarkMode() {
     const isDark = document.body.classList.toggle('dark-mode');
     document.getElementById('darkModeBtn').textContent = isDark ? '☀️' : '🌙';
     await updateSetting('darkMode', isDark);
 }
 
-// ---------- الإشعارات ----------
 async function loadNotifications() {
     const existing = document.getElementById('notifications-dropdown');
     if (existing) existing.remove();
@@ -318,29 +297,6 @@ async function loadNotifications() {
         };
         document.addEventListener('click', closeHandler);
     }, 10);
-}
-
-// ---------- شريط الأخبار ----------
-async function loadBreakingNews() {
-    const bar = document.getElementById('breakingNewsContent');
-    if (!bar) return;
-    try {
-        const snapshot = await db.collection('posts').orderBy('date', 'desc').limit(15).get();
-        if (snapshot.empty) {
-            bar.innerHTML = '<span class="breaking-item">لا توجد مقالات حديثة</span>';
-            return;
-        }
-        let itemsHTML = '';
-        snapshot.forEach((doc, index) => {
-            const post = doc.data();
-            const title = post.title || 'مقال بدون عنوان';
-            itemsHTML += `<span class="breaking-item">${title}</span>`;
-            if (index < snapshot.size - 1) itemsHTML += '<span class="breaking-sep">•</span>';
-        });
-        bar.innerHTML = itemsHTML + '<span class="breaking-sep">•</span>' + itemsHTML;
-    } catch (error) {
-        bar.innerHTML = '<span class="breaking-item">⚠️ خطأ في تحميل المقالات</span>';
-    }
 }
 
 console.log("✅ header.js تم تحميله بنجاح");
