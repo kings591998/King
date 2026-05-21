@@ -3,18 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <!-- عنوان الصفحة (سيُحدّث ديناميكياً) -->
     <title id="page-title">ALSHANFRICC</title>
     <meta name="description" content="مجلة ALSHANFRICC - مساحة الأناقة والمعرفة">
-
-    <!-- رابط الخطوط الديناميكي (يُملأ حسب الخط المختار) -->
     <link id="dynamic-font-link" rel="stylesheet" href="">
-
-    <!-- ملف التنسيقات الرئيسي -->
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
+
+    <!-- شاشة التحميل -->
+    <div id="preloader">
+        <div class="preloader-content">
+            <div class="preloader-logo">ALSHANFRICC</div>
+            <div class="preloader-bar-container">
+                <div class="preloader-bar" id="preloader-bar"></div>
+            </div>
+            <div class="preloader-number" id="preloader-number">0%</div>
+            <div class="preloader-dots">
+                <span>.</span><span>.</span><span>.</span>
+            </div>
+        </div>
+    </div>
 
     <!-- عرض فوري للهيكل الأساسي من localStorage -->
     <div id="instant-header"></div>
@@ -38,120 +46,80 @@
         })();
     </script>
 
-    <!-- ============================================================
-         1. الهيدر (الشريط العلوي)
-         سيتم بناؤه بالكامل عبر header.js
-         ============================================================ -->
-    <header id="site-header">
-        <!-- المحتوى يظهر هنا تلقائياً -->
-    </header>
+    <header id="site-header"></header>
 
-    <!-- ============================================================
-         2. المحتوى الرئيسي (البدي)
-         ============================================================ -->
     <main class="main-layout">
-        <section id="posts-feed" class="feed">
-            <!-- المقالات تظهر هنا عبر body.js -->
-        </section>
-
+        <section id="posts-feed" class="feed"></section>
         <aside class="right-sidebar">
             <div class="sticky-widget">
                 <h4>روابط سريعة</h4>
-                <div id="sidebar-buttons">
-                    <!-- أزرار مخصصة من الإعدادات -->
-                </div>
+                <div id="sidebar-buttons"></div>
             </div>
         </aside>
     </main>
 
-    <!-- ============================================================
-         3. الفوتر (التذييل)
-         سيتم بناؤه عبر footer.js
-         ============================================================ -->
-    <footer id="site-footer">
-        <!-- المحتوى يظهر هنا تلقائياً -->
-    </footer>
+    <footer id="site-footer"></footer>
 
-    <!-- ============================================================
-         4. مكتبات Firebase
-         ============================================================ -->
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
 
-    <!-- ============================================================
-         5. ملفات JavaScript الخاصة بالمشروع (بالترتيب)
-         ============================================================ -->
     <script src="assets/js/firebase-config.js"></script>
     <script src="assets/js/utils.js"></script>
     <script src="assets/js/header.js"></script>
     <script src="assets/js/body.js"></script>
     <script src="assets/js/footer.js"></script>
 
-    <!-- ============================================================
-         6. بدء التشغيل وتحميل الخط المناسب
-         ============================================================ -->
     <script>
         (function() {
-            // تحميل الخط المناسب من localStorage أو الافتراضي
             const savedFont = localStorage.getItem('selectedFont') || 'Cairo';
             const link = document.getElementById('dynamic-font-link');
             link.href = `https://fonts.googleapis.com/css2?family=${savedFont.replace(/ /g, '+')}:wght@400;700&display=swap`;
             document.body.style.fontFamily = savedFont + ', sans-serif';
         })();
 
+        function startPreloaderAnimation() {
+            const bar = document.getElementById('preloader-bar');
+            const number = document.getElementById('preloader-number');
+            if (!bar || !number) return;
+            let progress = 0;
+            const interval = setInterval(() => {
+                const increment = Math.max(1, Math.floor((100 - progress) / 15));
+                progress = Math.min(100, progress + increment);
+                bar.style.width = progress + '%';
+                number.textContent = progress + '%';
+                if (progress >= 100) clearInterval(interval);
+            }, 80);
+        }
+
         window.addEventListener('DOMContentLoaded', async () => {
             try {
-                // بناء جميع أجزاء الصفحة
+                startPreloaderAnimation();
                 await buildHeader();
                 await loadPosts(1);
                 await buildFooter();
 
-                // تحديث عنوان الصفحة
                 const siteName = await getSetting('siteName', 'ALSHANFRICC');
                 document.getElementById('page-title').textContent = siteName;
 
-                // إزالة الهيدر المؤقت
                 const instant = document.getElementById('instant-header');
                 if (instant) instant.style.display = 'none';
 
-                // بدء تدوير خلفيات الموقع
-                const bgImages = await getSetting('backgroundImages', []);
-                const bgInterval = parseInt(await getSetting('backgroundInterval', '60')) || 60;
-                if (bgImages.length > 0) {
-                    let currentBgIndex = 0;
-                    document.body.style.backgroundImage = `url('${bgImages[0]}')`;
-                    document.body.style.backgroundSize = 'cover';
-                    document.body.style.backgroundPosition = 'center';
-                    document.body.style.backgroundAttachment = 'fixed';
-                    setInterval(() => {
-                        currentBgIndex = (currentBgIndex + 1) % bgImages.length;
-                        document.body.style.backgroundImage = `url('${bgImages[currentBgIndex]}')`;
-                    }, bgInterval * 1000);
-                }
+                setTimeout(() => {
+                    const preloader = document.getElementById('preloader');
+                    if (preloader) {
+                        preloader.classList.add('hidden');
+                        setTimeout(() => preloader.remove(), 500);
+                    }
+                }, 300);
 
                 console.log('✅ تم تحميل الموقع بنجاح');
-
             } catch (error) {
                 console.error('❌ خطأ في تحميل الموقع:', error);
-            }
-
-            // فتح مقال محدد من الرابط ?post=...
-            const urlParams = new URLSearchParams(window.location.search);
-            const postId = urlParams.get('post');
-            if (postId) {
-                setTimeout(() => {
-                    const el = document.getElementById(`post-${postId}`);
-                    if (el) {
-                        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                        el.style.boxShadow = '0 0 0 3px var(--primary)';
-                        setTimeout(() => el.style.boxShadow = '', 3000);
-                    }
-                }, 2000);
+                document.getElementById('preloader')?.classList.add('hidden');
             }
         });
     </script>
-
 </body>
 </html>
