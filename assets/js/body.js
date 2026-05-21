@@ -30,8 +30,8 @@ async function loadPosts(page = 1) {
 
   try {
     let baseQuery = db.collection('posts');
-    if (window.currentCategoryId) baseQuery = baseQuery.where('category', '==', currentCategoryId);
-    if (window.currentSubcategoryId) baseQuery = baseQuery.where('subcategory', '==', currentSubcategoryId);
+    if (window.currentCategoryId) baseQuery = baseQuery.where('category', '==', window.currentCategoryId);
+    if (window.currentSubcategoryId) baseQuery = baseQuery.where('subcategory', '==', window.currentSubcategoryId);
     if (currentAuthorId) baseQuery = baseQuery.where('authorId', '==', currentAuthorId);
     if (currentSearchQuery) {
       baseQuery = baseQuery.where('title', '>=', currentSearchQuery)
@@ -640,25 +640,22 @@ async function showAuthorBio(authorId, postId) {
 function filterByAuthor(authorId) {
   if (!authorId) return;
   currentAuthorId = authorId;
-  if (typeof currentCategoryId !== 'undefined') window.currentCategoryId = null;
-  if (typeof currentSubcategoryId !== 'undefined') window.currentSubcategoryId = null;
+  window.currentCategoryId = null;
+  window.currentSubcategoryId = null;
   currentSearchQuery = '';
   currentPage = 1;
   loadPosts(1);
   closeAllMenus();
 }
 
-function clearAuthorFilter() {
-  currentAuthorId = null;
-  clearFilter();
-}
+function clearAuthorFilter() { currentAuthorId = null; clearFilter(); }
 
 function clearFilter() {
   currentAuthorId = null;
   currentSearchQuery = '';
   currentPage = 1;
-  if (typeof window.currentCategoryId !== 'undefined') window.currentCategoryId = null;
-  if (typeof window.currentSubcategoryId !== 'undefined') window.currentSubcategoryId = null;
+  window.currentCategoryId = null;
+  window.currentSubcategoryId = null;
   loadPosts(1);
 }
 
@@ -711,7 +708,6 @@ function updateReadingProgress(postId) {
     if (progress >= 99) { progressBar.style.background = 'var(--primary)'; }
     else { progressBar.style.background = 'linear-gradient(90deg, var(--primary-light), var(--primary))'; }
 }
-
 function setupReadingProgressObservers() {
     document.addEventListener('scroll', function(e) {
         const postBody = e.target.closest('.post-body.expanded');
@@ -727,14 +723,11 @@ setupReadingProgressObservers();
 function addPaginationControls(page, totalPages) {
   const oldPagination = document.getElementById('pagination-container');
   if (oldPagination) oldPagination.remove();
-
   if (totalPages <= 1) return;
-
   const feed = document.getElementById('posts-feed');
   const pagination = document.createElement('div');
   pagination.id = 'pagination-container';
   pagination.className = 'pagination-container';
-
   let html = '';
   html += `<button class="pagination-btn" ${page === 1 ? 'disabled' : ''} onclick="loadPosts(${page - 1})">◀ السابق</button>`;
   html += '<div class="pagination-numbers">';
@@ -746,7 +739,6 @@ function addPaginationControls(page, totalPages) {
   html += '</div>';
   html += `<button class="pagination-btn" ${page === totalPages ? 'disabled' : ''} onclick="loadPosts(${page + 1})">التالي ▶</button>`;
   html += `<span class="pagination-info">صفحة ${page} من ${totalPages} (${totalPostsCount} مقال)</span>`;
-
   pagination.innerHTML = html;
   feed.appendChild(pagination);
 }
