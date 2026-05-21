@@ -1,7 +1,6 @@
 // ============================================================
-//  ملف: header.js (مُدمَج - كامل ومُحدّث)
+//  ملف: header.js (مُحدّث - بدون بروفايل وبدون شريط أخبار)
 //  الوظيفة: بناء الهيدر وإدارة التبويبات والبحث والوضع الليلي
-//  يشمل: خلفية شفافة، شعار CC، إشعارات، بروفايل
 //  يعتمد على: firebase-config.js, utils.js
 // ============================================================
 
@@ -9,7 +8,6 @@ window.currentCategoryId = null;
 window.currentSubcategoryId = null;
 let categoriesData = [];
 
-// ---------- الدالة الرئيسية ----------
 async function buildHeader() {
     const settings = await getAllSettingsCached();
     const siteName = settings.siteName || 'ALSHANFRICC';
@@ -46,7 +44,6 @@ async function buildHeader() {
             <div class="header-icons">
                 <span class="icon-btn" id="searchToggle" title="بحث">🔍</span>
                 <span class="icon-btn" id="notificationBell" title="الإشعارات">🔔</span>
-                <span class="icon-btn profile-btn" id="profileBtn" title="الملف الشخصي">👤</span>
                 <span class="icon-btn" id="darkModeBtn" title="الوضع الليلي">${darkMode ? '☀️' : '🌙'}</span>
             </div>
         </div>
@@ -116,35 +113,6 @@ function attachHeaderEvents() {
         loadNotifications();
     });
 
-    document.getElementById('profileBtn').addEventListener('click', (e) => {
-        e.stopPropagation();
-        const menu = document.getElementById('profile-dropdown');
-        if (menu) { menu.remove(); return; }
-        const rect = e.target.getBoundingClientRect();
-        const dropdown = document.createElement('div');
-        dropdown.id = 'profile-dropdown';
-        dropdown.className = 'profile-dropdown';
-        dropdown.style.top = (rect.bottom + window.scrollY + 8) + 'px';
-        dropdown.style.left = (rect.left + window.scrollX - 180) + 'px';
-        dropdown.innerHTML = `
-            <div class="profile-dropdown-item" onclick="showToast('قيد التطوير', 'info')">👤 الملف الشخصي</div>
-            <div class="profile-dropdown-item" onclick="showToast('قيد التطوير', 'info')">⚙️ الإعدادات</div>
-            <div class="profile-dropdown-item" onclick="window.location.href='admin.html'">📊 لوحة التحكم</div>
-            <div class="profile-dropdown-divider"></div>
-            <div class="profile-dropdown-item" onclick="showToast('قيد التطوير', 'info')">🚪 تسجيل الخروج</div>
-        `;
-        document.body.appendChild(dropdown);
-        setTimeout(() => {
-            const closeHandler = (ev) => {
-                if (!dropdown.contains(ev.target) && ev.target !== document.getElementById('profileBtn')) {
-                    dropdown.remove();
-                    document.removeEventListener('click', closeHandler);
-                }
-            };
-            document.addEventListener('click', closeHandler);
-        }, 10);
-    });
-
     document.getElementById('darkModeBtn').addEventListener('click', toggleDarkMode);
 
     document.addEventListener('click', (e) => {
@@ -183,10 +151,36 @@ function handleTabClick(event, catId) {
     scrollToPosts();
 }
 
+function activateTab(catId, subId) {
+    if (catId) {
+        window.currentCategoryId = catId;
+        document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+        const tab = document.querySelector(`.tab-item[data-id="${catId}"]`);
+        if (tab) tab.classList.add('active');
+        const category = categoriesData.find(c => c.id === catId);
+        if (category && category.subcategories && category.subcategories.length > 0) {
+            showSubcategories(category.subcategories);
+            if (subId) {
+                window.currentSubcategoryId = subId;
+                setTimeout(() => {
+                    document.querySelectorAll('.sub-item').forEach(s => s.classList.remove('active'));
+                    const subItem = document.querySelector(`.sub-item[onclick*="${subId}"]`);
+                    if (subItem) subItem.classList.add('active');
+                }, 50);
+            }
+        } else {
+            hideSubcategories();
+        }
+    } else {
+        goHome();
+    }
+    if (typeof loadPosts === 'function') loadPosts(1);
+}
+
 function showSubcategories(subcategories) {
     const bar = document.getElementById('subcategoryBar');
     let html = '<div class="subcategory-list">';
-    html += `<span class="sub-item sub-close-btn" onclick="hideSubcategoriesAndReset()" title="إغلاق الفروع">✕</span>`;
+    html += `<span class="sub-item sub-close-btn" onclick="hideSubcategoriesAndReset()">✕</span>`;
     html += `<span class="sub-item ${!window.currentSubcategoryId ? 'active' : ''}" onclick="selectSubcategory(null)">الكل</span>`;
     subcategories.forEach((sub, index) => {
         const subId = sub.id || `sub-${index}`;
