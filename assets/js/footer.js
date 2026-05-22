@@ -1,9 +1,6 @@
 // ============================================================
-//  ملف: footer.js (مُحدّث - بدون أسهم)
+//  ملف: footer.js (مُحدّث - بطاقات تُفتح كروابط)
 //  الوظيفة: بناء تذييل الموقع (الفوتر) وإدارته
-//  يشمل: تبويبات أفقية مع تمرير لا نهائي، أزرار تمرير مزدوجة،
-//         الصفحات الثابتة، السنة التلقائية، بوابة الأدمن
-//  يعتمد على: firebase-config.js, utils.js
 // ============================================================
 
 let footerActiveTab = 'latest';
@@ -164,15 +161,17 @@ function createFooterHorizontalCard(post) {
   const card = document.createElement('div');
   card.className = 'footer-horizontal-card';
   const firstImage = getFirstImage(post.content);
+  const url = `${window.location.origin}${window.location.pathname}?post=${post.id}`;
+
   card.innerHTML = `
-    ${firstImage ? `<img src="${firstImage}" class="footer-card-image" loading="lazy" onerror="this.style.display='none'">` : ''}
-    <div class="footer-card-content">
-      <h4 class="footer-card-title">${post.title}</h4>
-      <p class="footer-card-meta">${timeAgo(post.date)} · ${post.views || 0} 👁️</p>
-    </div>
+    <a href="${url}" target="_blank" onclick="event.preventDefault(); window.open('${url}', '_blank');">
+      ${firstImage ? `<img src="${firstImage}" class="footer-card-image" loading="lazy" onerror="this.style.display='none'">` : ''}
+      <div class="footer-card-content">
+        <h4 class="footer-card-title">${post.title}</h4>
+        <p class="footer-card-meta">${timeAgo(post.date)} · ${post.views || 0} 👁️</p>
+      </div>
+    </a>
   `;
-  card.addEventListener('click', () => openPost(post.id));
-  card.style.cursor = 'pointer';
   return card;
 }
 
